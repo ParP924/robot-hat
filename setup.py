@@ -159,6 +159,10 @@ APT_INSTALL_LIST = [
     'libsdl2-dev',
     'libsdl2-mixer-dev',
     'portaudio19-dev',  # pyaudio
+    'zip',
+    'unzip',
+    'python3-setuptools',
+#    'python-setuptools'
 ]
 if ubuntu_version in [
         "22.04",
@@ -210,7 +214,22 @@ def install():
             for dep in PIP_INSTALL_LIST:
                 do(msg=f"install {dep}",
                    cmd=f'sudo pip3 install {dep} {_is_bsps}')
-
+        
+            # Build and install pigpio
+            # =============================
+            print("Build and install pigpio")
+            do(msg="download pigpio", cmd='wget https://github.com/joan2937/pigpio/archive/master.zip -O ../master.zip' +
+                '&& unzip -o ../master.zip -d ../')
+            
+            do(msg="build and install pigpio", cmd='cd ../pigpio-master' +
+                '&& make' +
+                '&& sudo make install' +
+                'rm -rf ../master.zip')
+            
+            # Enab;e pigpiod service on boot
+            do(msg="enable pigpiod service", cmd='sudo systemctl enable pigpiod')
+            
+        
         # Setup interfaces
         # =============================
         print("Setup interfaces")
